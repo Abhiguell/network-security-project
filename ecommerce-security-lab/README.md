@@ -1,53 +1,237 @@
 # E-Commerce Security Testing and Malware Simulation Laboratory
 
-Two **separate** websites for a Network Security project:
+A Network Security project demonstrating security threats, detection, and incident response through two interconnected web applications.
 
-| | Website 1: **LabMart** (victim) | Website 2: **CyberSim Lab** (attack simulator) |
+## Project Overview
+
+This project consists of two separate web applications:
+
+1. **LabMart (Victim Website)** – A simulated e-commerce platform with product browsing, shopping cart, checkout, customer accounts, admin dashboard, and security monitoring.
+2. **CyberSim Lab (Simulation Dashboard)** – A cybersecurity control panel used to demonstrate spyware, ransomware, and trojan attack simulations against LabMart.
+
+The applications communicate through an authenticated REST API using HMAC signatures.
+
+## Project Objectives
+
+- Demonstrate common cybersecurity threats in an e-commerce environment.
+- Understand how malware-related activities can affect online systems.
+- Implement security monitoring and incident detection.
+- Demonstrate authentication, authorization, and API security.
+- Explore incident response and recovery procedures.
+- Analyze network traffic using Wireshark.
+
+## Features
+
+### 1. LabMart – E-Commerce Website
+
+- Product catalog and shopping cart.
+- Customer registration and authentication.
+- Checkout and order management.
+- Midtrans Sandbox payment integration.
+- Admin dashboard.
+- Security event monitoring.
+- Incident management.
+
+### 2. CyberSim Lab – Security Simulation
+
+**Spyware Simulation**
+- Demonstrates simulated access to synthetic customer records.
+- Displays data exposure events.
+- Generates security alerts and incidents.
+
+**Ransomware Simulation**
+- Demonstrates simulated file-locking behavior.
+- Uses a dedicated sandbox directory.
+- Supports recovery and SHA-256 integrity verification.
+
+**Trojan Simulation**
+- Demonstrates simulated installation and network beacon activity.
+- Generates suspicious connection events.
+- Demonstrates command-and-control beacon detection.
+
+## Technologies Used
+
+| Technology | Purpose |
+|---|---|
+| Python | Backend development |
+| Flask | Web application framework |
+| SQLite | Database management |
+| HTML | Web page structure |
+| CSS | User interface styling |
+| JavaScript | Frontend interactions |
+| REST API | Communication between applications |
+| HMAC-SHA256 | API request authentication |
+| Midtrans Sandbox | Payment simulation |
+| Wireshark | Network traffic analysis |
+
+## Project Architecture
+
+The project uses two independent Flask applications.
+
+| Application | Local URL | Port |
 |---|---|---|
-| URL | http://127.0.0.1:5000 | http://127.0.0.1:5001 |
-| Purpose | Working online store with Midtrans Sandbox, admin dashboard and security monitoring | Control panel that runs spyware / ransomware / trojan simulations against the store |
-| Look | Light retail theme | Dark cybersecurity console |
-| Accounts | admin `admin / Admin@12345` · customer `budi / Customer@123` | `labadmin / LabAdmin@123` · `analyst / Analyst@123` · `viewer / Viewer@123` (read-only) |
-| Database | `shop/instance/shop.db` | `lab/instance/lab.db` |
+| LabMart | http://127.0.0.1:5000 | 5000 |
+| CyberSim Lab | http://127.0.0.1:5001 | 5001 |
 
-They talk **only** through an HMAC-signed REST API (`/api/sim/...` on the store).
+Both applications maintain separate databases and authentication systems.
 
-## Run it (Windows)
+Communication between them uses an HMAC-authenticated REST API.
+
+## Project Structure
+
+```text
+ecommerce-security-lab/
+├── docs/
+│   ├── PROJECT_DOCUMENTATION.md
+│   └── DEMO_SCRIPT.md
+├── lab/
+│   ├── routes/
+│   ├── security/
+│   ├── templates/
+│   └── simulations.py
+├── shop/
+│   ├── payments/
+│   ├── routes/
+│   ├── security/
+│   ├── templates/
+│   └── ransomware_sandbox.py
+├── tests/
+├── .env.example
+├── .gitignore
+├── README.md
+├── requirements.txt
+├── run_lab.py
+├── run_shop.py
+└── start_all.bat
 ```
+
+## Installation
+
+### Requirements
+
+- Python 3.10 or newer
+- Git
+- Windows (for the provided startup script)
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Abhiguell/network-security-project.git
+cd network-security-project/ecommerce-security-lab
+```
+
+### 2. Create a virtual environment
+
+```bash
 python -m venv venv
+```
+
+### 3. Activate the environment
+
+Windows PowerShell:
+
+```powershell
 venv\Scripts\activate
+```
+
+### 4. Install dependencies
+
+```bash
 pip install -r requirements.txt
+```
+
+### 5. Start both applications
+
+```bash
 start_all.bat
 ```
-`start_all.bat` opens both servers in two windows and both sites in your browser.
-Manual alternative: `python run_shop.py` in one terminal, then `python run_lab.py` in a second one.
 
-**Live demo:** Tab 1 = LabMart admin, Tab 2 = CyberSim Lab. Click **Start Spyware / Ransomware / Trojan Simulation**
-in the lab; within 3 seconds the store's admin shows a pop-up alert, a red incident banner and a new threat level.
-**Reset environment** on the lab dashboard undoes everything.
+Alternatively, run the applications separately:
 
-## Midtrans Sandbox (optional)
-1. Create a free account at https://dashboard.sandbox.midtrans.com and copy the **Sandbox** Server Key and Client Key (start with `SB-Mid-`).
-2. Put them in `.env` (see `.env.example`): `MIDTRANS_SERVER_KEY=SB-Mid-server-...`
-3. Restart `run_shop.py`. Checkout now redirects to Midtrans' payment page.
-   Test card `4811 1111 1111 1114`, CVV `123`, any future expiry, OTP `112233`.
+Terminal 1:
 
-Without keys the store uses a clearly-labelled **Demo gateway**, so the demo always works offline.
-Only sandbox keys (`SB-…`) are accepted; the server key never leaves the server.
-
-## Tests
+```bash
+python run_shop.py
 ```
+
+Terminal 2:
+
+```bash
+python run_lab.py
+```
+
+## Running the Simulation
+
+1. Open LabMart at `http://127.0.0.1:5000`.
+2. Open CyberSim Lab at `http://127.0.0.1:5001`.
+3. Log in to the respective dashboards using the local demo accounts.
+4. Select a simulation module.
+5. Start the simulation.
+6. Observe the security alerts and incidents in LabMart.
+7. Use the Reset Environment function to restore the simulation state.
+
+Default demo credentials are documented in the project documentation. They are for local educational use only and must be changed before any deployment.
+
+## Security Features
+
+The project demonstrates several defensive security mechanisms:
+
+- Password hashing.
+- Role-based access control.
+- CSRF protection.
+- SQL injection prevention through parameterized queries.
+- XSS protection.
+- Login attempt monitoring and account lockout.
+- HMAC-signed API requests.
+- Timestamp validation and nonce-based replay protection.
+- Security event logging.
+- Incident detection and recovery.
+
+## Testing
+
+Run the automated test suite:
+
+```bash
 python -m unittest discover -s tests -v
 ```
-29 tests cover the store, payments (Midtrans mocked), the signed API, both access-control systems, all three
-simulations end-to-end, reset, and the store being offline.
 
-## Safety guarantees
-* The lab can only read rows flagged `is_synthetic = 1` (25 generated customers with `@example.com` emails).
-* Real customers, orders and payments are never returned or modified (verified by tests).
-* Ransomware touches only `shop/sandbox/dummy_files/`, never encrypts/renames/deletes; SHA-256 proves it.
-* The trojan has no persistence and no remote access. It only sends simulated network events.
-* Simulation endpoints need: HMAC signature + 60 s timestamp + one-time nonce + lab role admin/analyst +
-  private/loopback IP + the store admin's "API enabled" switch.
+The project includes 29 tests covering:
 
-Docs: `docs/PROJECT_DOCUMENTATION.md` (architecture, API, security, testing, Wireshark) · `docs/DEMO_SCRIPT.md`.
+- E-commerce functionality.
+- Authentication and authorization.
+- Payment integration behavior.
+- API security.
+- Spyware, ransomware, and trojan simulations.
+- Simulation reset and recovery.
+
+## Safety and Limitations
+
+This project is designed strictly for educational purposes.
+
+- Spyware simulations use synthetic customer records.
+- Ransomware simulations operate only within a dedicated sandbox directory.
+- No real customer information is accessed.
+- No real files are encrypted or deleted.
+- Trojan activity is simulated without persistence or remote access.
+- Simulation requests require authenticated API access.
+
+This laboratory should only be used in an authorized testing environment.
+
+## Documentation
+
+Additional project documentation:
+
+- `docs/PROJECT_DOCUMENTATION.md` – Architecture, security implementation, API details, testing, and network analysis.
+- `docs/DEMO_SCRIPT.md` – Demonstration instructions.
+
+## Project Information
+
+**Project:** E-Commerce Security Testing and Malware Simulation Laboratory
+
+**Course:** Network Security
+
+**Repository:** [GitHub - Abhiguell/network-security-project](https://github.com/Abhiguell/network-security-project)
+
+---
+
+*Developed as an educational Network Security project.*
