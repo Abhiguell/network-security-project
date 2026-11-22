@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% from "_macros.html" import product_card with context %}
+{% block title %}{{ p.name }}{% endblock %}
+{% block content %}
+<p class="small muted"><a href="{{ url_for('store.catalog') }}">Products</a> › <a href="{{ url_for('store.catalog', category=p.category) }}">{{ p.category }}</a> › {{ p.name }}</p>
+<div class="grid g2 card">
+  <div class="thumb lg" style="background: linear-gradient(135deg, {{ p.color }}22, {{ p.color }}66)">{{ p.emoji }}</div>
+  <div>
+    <span class="cat-tag">{{ p.category }} · SKU {{ p.sku }}</span>
+    <h1>{{ p.name }}</h1>
+    <div class="price big">{{ p.price|rupiah }}</div>
+    <p>{{ p.description }}</p>
+    {% if p.stock == 0 %}<p class="stock out">Out of stock</p>{% else %}<p class="stock {{ 'low' if p.stock < 20 }}">{{ p.stock }} in stock</p>{% endif %}
+    <form method="post" action="{{ url_for('store.cart_add') }}" class="qty mt">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="product_id" value="{{ p.id }}">
+      <input type="number" name="qty" value="1" min="1" max="10" aria-label="Quantity">
+      <button class="btn btn-lg" type="submit" {{ 'disabled' if p.stock == 0 }}>🛒 Add to cart</button>
+    </form>
+    <ul class="small muted mt"><li>Free shipping · 7-day returns</li><li>Secure payment via Midtrans Sandbox</li></ul>
+  </div>
+</div>
+{% if related %}
+<div class="section-title mt"><h2>You may also like</h2></div>
+<div class="products">{% for r in related %}{{ product_card(r) }}{% endfor %}</div>
+{% endif %}
+{% endblock %}

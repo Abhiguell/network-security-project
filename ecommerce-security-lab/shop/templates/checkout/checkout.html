@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Checkout{% endblock %}
+{% block content %}
+<div class="page-title"><h1>Checkout</h1></div>
+<form method="post" class="split">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="card">
+    <h2>Shipping details</h2>
+    <div class="row">
+      <div><label for="shipping_name">Recipient name</label><input type="text" id="shipping_name" name="shipping_name" value="{{ form.shipping_name }}" maxlength="60" required></div>
+      <div><label for="shipping_phone">Phone</label><input type="text" id="shipping_phone" name="shipping_phone" value="{{ form.shipping_phone }}" maxlength="20" required></div>
+    </div>
+    <label for="address">Address</label><input type="text" id="address" name="address" value="{{ form.address }}" maxlength="150" required>
+    <label for="city">City</label><input type="text" id="city" name="city" value="{{ form.city }}" maxlength="40" required>
+    <h2 class="mt">Payment method</h2>
+    {% if midtrans_live %}
+      <p>💳 <b>Midtrans Sandbox</b>: you'll be sent to Midtrans' secure page to pay with a <b>test</b> card, e-wallet or virtual account.</p>
+      <p class="sim-note">Sandbox test card: <span class="mono">4811 1111 1111 1114</span> · CVV <span class="mono">123</span> · any future expiry · OTP <span class="mono">112233</span>. No real money moves.</p>
+    {% else %}
+      <p>🧪 <b>Demo gateway</b>: Midtrans keys are not configured, so a simulated payment page is used.</p>
+      <p class="sim-note">To enable Midtrans Sandbox, add your <span class="mono">SB-Mid-server-…</span> key to the <span class="mono">.env</span> file (see README).</p>
+    {% endif %}
+  </div>
+  <div class="card">
+    <h2>Your order</h2>
+    {% for i in items %}<div class="summary-row"><span>{{ i.product.emoji }} {{ i.name }} × {{ i.qty }}</span><span>{{ i.subtotal|rupiah }}</span></div>{% endfor %}
+    <div class="summary-row"><span>Shipping</span><span>Free</span></div>
+    <div class="summary-row total"><span>Total</span><span>{{ total|rupiah }}</span></div>
+    <button class="btn btn-lg w-100 mt" type="submit">{{ 'Pay with Midtrans →' if midtrans_live else 'Place order →' }}</button>
+    <p class="hint mt">🔒 We never see or store your card details.</p>
+  </div>
+</form>
+{% endblock %}

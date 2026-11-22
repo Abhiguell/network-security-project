@@ -1,0 +1,33 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Simulation API{% endblock %}
+{% block admin %}
+<div class="page-title"><div><h1>🧪 Simulation API control</h1><p>Controls what the Cyber Lab (second website) is allowed to do to this store.</p></div></div>
+<div class="grid g2 mb">
+  <div class="card">
+    <h2>API access</h2>
+    <p>Status: {% if enabled %}<span class="badge b-ok">enabled</span>{% else %}<span class="badge b-bad">disabled</span>{% endif %}</p>
+    <form method="post" class="mb">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {% if enabled %}<input type="hidden" name="enabled" value="0"><button class="btn btn-red" type="submit">Disable simulation API</button>
+      {% else %}<input type="hidden" name="enabled" value="1"><button class="btn btn-teal" type="submit">Enable simulation API</button>{% endif %}
+    </form>
+    <ul class="small muted">
+      <li>Requests must be HMAC-SHA256 signed with the shared secret in <span class="mono">.env</span> (the secret never travels over the network).</li>
+      <li>Each request is valid for 60 s and its nonce can be used only once (replay protection).</li>
+      <li>Only lab roles <b>admin</b> and <b>analyst</b> may run simulations; only localhost/private IPs are accepted.</li>
+      <li>The API can only READ synthetic records. It never modifies real customers, orders or payments.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>Ransomware sandbox <span class="small muted mono">shop/sandbox/dummy_files</span></h2>
+    {% for f in sandbox.files %}<div class="file-row {{ 'locked' if f.locked }}"><span>{{ '🔒' if f.locked else '📄' }} {{ f.display_name }}</span><span class="mono small">{{ f.sha256[:12] }}…</span></div>{% endfor %}
+  </div>
+</div>
+<div class="card"><h2>Simulation traffic received</h2><div class="table-wrap"><table>
+  <thead><tr><th>Time</th><th>Module</th><th>Type</th><th>Bot</th><th>Seq</th><th>Bytes</th><th>Source</th><th>Operator</th></tr></thead>
+  <tbody>
+  {% for t in traffic %}<tr><td class="small">{{ t.ts[11:] }}</td><td><b>{{ t.module }}</b></td><td>{{ t.kind }}</td><td class="mono small">{{ t.bot_id or '-' }}</td><td>{{ t.seq }}</td><td>{{ t.bytes }}</td><td class="mono small">{{ t.ip }}</td><td class="mono small">{{ t.operator }}</td></tr>
+  {% else %}<tr><td colspan="8" class="empty">No simulation traffic yet.</td></tr>{% endfor %}
+  </tbody>
+</table></div></div>
+{% endblock %}

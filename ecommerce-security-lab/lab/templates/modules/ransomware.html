@@ -1,0 +1,26 @@
+{% extends "modules/_module.html" %}
+{% block data_attrs %}data-start="{{ url_for('api.ransomware_start') }}" data-reset="{{ url_for('api.ransomware_reset') }}" data-state="{{ url_for('api.ransomware_state') }}"{% endblock %}
+{% block start_class %}btn-danger{% endblock %}
+{% block controls_extra %}
+<p class="small muted">Targets only <code>shop/sandbox/dummy_files/</code> on the store. Files are <b>never encrypted, deleted or modified</b>:
+  the locked status is a flag, and SHA-256 hashes prove integrity on reset.</p>
+{% endblock %}
+{% block secondary_buttons %}<button class="btn btn-ghost" id="resetBtn" type="button" {{ 'disabled' if not can_run }}>↺ Reset &amp; verify integrity</button>{% endblock %}
+{% block results_empty %}<div class="results-empty">Loading sandbox state…</div>{% endblock %}
+{% block impact %}
+<div class="grid grid-3">
+  <div><h3>What happened</h3><ul>
+    <li>A malicious payload ran on the store server and "encrypted" its files.</li>
+    <li>Product backups, invoices and reports became unusable; a <b>ransom note</b> was dropped.</li>
+    <li>The store detected <b>mass file access + mass rename</b> and opened a CRITICAL incident.</li></ul></div>
+  <div><h3>Real-world consequences</h3><ul>
+    <li>Store offline: no sales during recovery (hours to weeks).</li>
+    <li>Double extortion: attackers threaten to leak stolen data.</li>
+    <li>Paying does not guarantee recovery and funds criminals.</li></ul></div>
+  <div><h3>Defences</h3><ul>
+    <li><b>3-2-1 offline backups</b> with regular restore tests (shown by Reset).</li>
+    <li>EDR behaviour detection, least-privilege file permissions.</li>
+    <li>Patch management, email filtering, network segmentation.</li>
+    <li>An incident response plan: isolate → eradicate → restore.</li></ul></div>
+</div>
+{% endblock %}

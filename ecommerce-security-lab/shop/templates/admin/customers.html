@@ -1,0 +1,27 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Customers{% endblock %}
+{% block admin %}
+<div class="page-title"><div><h1>Customers</h1><p>Emails are masked to limit exposure. <span class="badge b-synthetic">synthetic</span> = generated test record (the only data the Cyber Lab may read).</p></div></div>
+<div class="card"><div class="table-wrap"><table>
+  <thead><tr><th>User</th><th>Email</th><th>Type</th><th>Orders</th><th>Status</th><th>Last login</th><th></th></tr></thead>
+  <tbody>
+  {% for u in users %}
+    {% set locked = u.locked_until and u.locked_until > now %}
+    <tr>
+      <td><b>{{ u.username }}</b><br><span class="small muted">{{ u.full_name }}</span></td>
+      <td class="mono small">{{ mask(u.email) }}</td>
+      <td>{% if u.role == 'admin' %}<span class="badge b-admin">admin</span>{% elif u.is_synthetic %}<span class="badge b-synthetic">synthetic</span>{% else %}<span class="badge b-web">customer</span>{% endif %}</td>
+      <td>{{ u.order_count }}</td>
+      <td>{% if not u.is_active %}<span class="badge b-bad">disabled</span>{% elif locked %}<span class="badge b-high">locked</span>{% else %}<span class="badge b-ok">active</span>{% endif %}</td>
+      <td class="small">{{ u.last_login or '-' }}</td>
+      <td style="white-space:nowrap">
+        {% if u.id != g.user.id and not u.is_synthetic %}
+          {% if locked %}<form class="inline" method="post" action="{{ url_for('admin.customer_action', uid=u.id, action='unlock') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-teal btn-sm">Unlock</button></form>{% endif %}
+          <form class="inline" method="post" action="{{ url_for('admin.customer_action', uid=u.id, action='toggle-active') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-outline btn-sm">{{ 'Disable' if u.is_active else 'Enable' }}</button></form>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table></div></div>
+{% endblock %}

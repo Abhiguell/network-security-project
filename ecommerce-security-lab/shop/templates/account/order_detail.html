@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge %}
+{% block title %}Order {{ order.order_code }}{% endblock %}
+{% block content %}
+<p class="small"><a href="{{ url_for('account.orders') }}">← Back to order history</a></p>
+<div class="page-title"><div><h1>Order <span class="mono">{{ order.order_code }}</span></h1><p>Placed {{ order.created_at }}</p></div>
+  <div>{{ status_badge(order.status) }}</div></div>
+<div class="split">
+  <div class="card">
+    <h2>Items</h2>
+    <table>
+      <thead><tr><th>Product</th><th>Price</th><th>Qty</th><th class="right">Subtotal</th></tr></thead>
+      <tbody>{% for i in items %}<tr><td>{{ i.name }}</td><td>{{ i.price|rupiah }}</td><td>{{ i.qty }}</td><td class="right">{{ (i.price * i.qty)|rupiah }}</td></tr>{% endfor %}</tbody>
+    </table>
+    <div class="summary-row total"><span>Total</span><span>{{ order.total|rupiah }}</span></div>
+  </div>
+  <div class="card">
+    <h2>Delivery</h2>
+    <p><b>{{ order.shipping_name }}</b><br>{{ order.shipping_phone }}<br>{{ order.shipping_address }}</p>
+    <h2>Payment</h2>
+    <p>{{ 'Midtrans Sandbox' if order.payment_method == 'midtrans' else 'Demo gateway (simulated)' }}<br>
+      <span class="muted small">Gateway status: {{ order.payment_status or '-' }}{% if order.paid_at %} · paid {{ order.paid_at }}{% endif %}</span></p>
+    {% if order.status == 'pending' and order.payment_method == 'demo' and order.user_id == g.user.id %}
+      <a class="btn w-100" href="{{ url_for('checkout.demo_pay', code=order.order_code) }}">Complete payment</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

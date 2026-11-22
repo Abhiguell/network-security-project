@@ -1,0 +1,29 @@
+{% extends "modules/_module.html" %}
+{% block data_attrs %}data-start="{{ url_for('api.trojan_start') }}" data-stop="{{ url_for('api.trojan_stop') }}"{% endblock %}
+{% block start_class %}btn-blue{% endblock %}
+{% block controls_extra %}
+<p class="small muted">Simulates a fake "FreeVoucherGenerator.exe" on a store POS terminal. Its hidden routine sends periodic beacons to a
+  "C2 server" (the store's simulation API), so you can watch them live and in Wireshark. <b>No persistence and no remote access</b> are implemented.</p>
+<div class="form-row">
+  <div><label for="interval">Beacon interval</label><select id="interval"><option value="1">1 s</option><option value="2" selected>2 s</option><option value="3">3 s</option><option value="5">5 s</option></select></div>
+  <div><label for="count">Beacons</label><select id="count"><option>8</option><option selected>12</option><option>20</option><option>30</option></select></div>
+</div>
+{% endblock %}
+{% block secondary_buttons %}<button class="btn btn-ghost" id="stopBtn" type="button" disabled>■ Stop trojan</button>{% endblock %}
+{% block impact %}
+<div class="grid grid-3">
+  <div><h3>What happened</h3><ul>
+    <li>A user installed a "free voucher" app that secretly contained a trojan.</li>
+    <li>It <b>beaconed</b> to a command-and-control server at a fixed interval and uploaded (fake) system info.</li>
+    <li>The store's monitoring flagged a <b>Suspicious Application</b> and <b>C2 Beaconing</b> (low timing jitter).</li></ul></div>
+  <div><h3>Real-world consequences</h3><ul>
+    <li>Attackers can later push other malware (ransomware, card skimmers on POS).</li>
+    <li>Stolen credentials allow access to the store admin panel.</li>
+    <li>The infected device becomes part of a botnet.</li></ul></div>
+  <div><h3>Defences</h3><ul>
+    <li>Application allow-listing; block unsigned downloads.</li>
+    <li>Egress firewall + DNS filtering to block C2 domains.</li>
+    <li>IDS / beacon detection on network traffic (Wireshark: <code>http.request.uri contains "trojan"</code>).</li>
+    <li>User awareness: "free voucher" offers are classic lures.</li></ul></div>
+</div>
+{% endblock %}

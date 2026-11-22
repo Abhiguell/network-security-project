@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Admin sign in' if admin_portal else 'Sign in' }}{% endblock %}
+{% block content %}
+<div class="card auth {{ 'admin' if admin_portal }}">
+  <h1>{{ '⚙ Store admin portal' if admin_portal else 'Sign in to LabMart' }}</h1>
+  <p class="muted small">{{ 'Restricted to store administrators. All attempts are logged.' if admin_portal else 'Welcome back! Sign in to check out and see your orders.' }}</p>
+  <form method="post" autocomplete="off">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="username">Username</label>
+    <input type="text" id="username" name="username" maxlength="50" required autofocus>
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" maxlength="128" required>
+    <button class="btn {{ 'btn-dark' if admin_portal }} btn-lg w-100 mt" type="submit">Sign in</button>
+  </form>
+  <p class="hint mt">Accounts lock for 10 minutes after 5 failed attempts.</p>
+  <p class="small center mt">
+    {% if admin_portal %}<a href="{{ url_for('auth.login') }}">← Customer sign in</a>
+    {% else %}New here? <a href="{{ url_for('auth.register') }}">Create an account</a>{% endif %}
+  </p>
+</div>
+{% endblock %}

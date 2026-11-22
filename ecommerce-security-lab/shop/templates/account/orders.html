@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge %}
+{% block title %}My orders{% endblock %}
+{% block content %}
+<div class="page-title"><h1>📦 Order history</h1></div>
+<div class="card">
+  <div class="table-wrap"><table>
+    <thead><tr><th>Order</th><th>Date</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    {% for o in orders %}
+      <tr>
+        <td class="mono">{{ o.order_code }}</td><td>{{ o.created_at }}</td><td>{{ o.items }}</td>
+        <td><b>{{ o.total|rupiah }}</b></td><td>{{ 'Midtrans Sandbox' if o.payment_method == 'midtrans' else 'Demo gateway' }}</td>
+        <td>{{ status_badge(o.status) }}</td>
+        <td class="right">
+          {% if o.status == 'pending' and o.payment_method == 'demo' %}<a class="btn btn-sm" href="{{ url_for('checkout.demo_pay', code=o.order_code) }}">Pay now</a>{% endif %}
+          <a class="btn btn-outline btn-sm" href="{{ url_for('account.order_detail', code=o.order_code) }}">Details</a>
+        </td>
+      </tr>
+    {% else %}<tr><td colspan="7" class="empty">No orders yet. <a href="{{ url_for('store.catalog') }}">Start shopping</a></td></tr>{% endfor %}
+    </tbody>
+  </table></div>
+</div>
+{% endblock %}

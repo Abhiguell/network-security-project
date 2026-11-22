@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{% block title %}Shop{% endblock %} · LabMart</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/shop.css') }}">
+</head>
+<body>
+<div class="topstrip">
+  <div class="container">
+    <span>🎓 Test environment for a Network Security project. All customer data is synthetic.</span>
+    <span>Payments: {% if midtrans_live %}<span class="pill">Midtrans Sandbox</span>{% else %}<span class="pill">Demo gateway</span>{% endif %}</span>
+  </div>
+</div>
+<header class="site">
+  <div class="container">
+    <a class="logo" href="{{ url_for('store.home') }}">Lab<span>Mart</span></a>
+    <form class="search" action="{{ url_for('store.catalog') }}" method="get" role="search">
+      <input type="search" name="q" placeholder="Search products…" maxlength="50" value="{{ request.args.get('q', '') }}">
+      <button type="submit">Search</button>
+    </form>
+    <nav class="nav-links">
+      {% if g.user %}
+        {% if g.user.role == 'admin' %}<a href="{{ url_for('admin.dashboard') }}">⚙ Admin</a>{% endif %}
+        <a href="{{ url_for('account.orders') }}">My Orders</a>
+        <a href="{{ url_for('account.profile') }}">👤 {{ g.user.username }}</a>
+        <form class="inline" method="post" action="{{ url_for('auth.logout') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn-outline btn-sm" type="submit">Sign out</button>
+        </form>
+      {% else %}
+        <a href="{{ url_for('auth.login') }}">Sign in</a>
+        <a class="btn btn-sm" href="{{ url_for('auth.register') }}">Register</a>
+      {% endif %}
+      <a class="cart-link" href="{{ url_for('store.cart') }}" title="Cart">🛒{% if cart_count %}<span class="count">{{ cart_count }}</span>{% endif %}</a>
+    </nav>
+  </div>
+</header>
+<div class="catbar"><div class="container">
+  <a href="{{ url_for('store.catalog') }}">All products</a>
+  {% for c in ['Electronics', 'Fashion', 'Food & Drink', 'Home'] %}<a href="{{ url_for('store.catalog', category=c) }}">{{ c }}</a>{% endfor %}
+  <a href="{{ url_for('auth.admin_login') }}" style="margin-left:auto">Admin portal</a>
+</div></div>
+
+<main class="page">
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}
+      <div class="flashes">{% for c, m in messages %}<div class="flash flash-{{ c }}">{{ m }}</div>{% endfor %}</div>
+    {% endif %}{% endwith %}
+    {% block content %}{% endblock %}
+  </div>
+</main>
+
+<footer class="site"><div class="container">
+  <span><b style="color:#fff">LabMart</b> · demo store for the E-Commerce Security Testing &amp; Malware Simulation Laboratory</span>
+  <span>No real products are sold. No real payments are taken.</span>
+</div></footer>
+{% if phishing_lure %}
+<!-- Simulated phishing lure (awareness training). Shown while a spyware incident is open. Collects nothing. -->
+<div class="lure" id="phishLure" data-id="{{ phishing_lure }}" role="alertdialog" aria-labelledby="lureTitle">
+  <div class="lure-box">
+    <div class="lure-head">⚠️ <b id="lureTitle">LabMart Security Team</b><span class="lure-time">now</span></div>
+    <p><b>Unusual activity detected on your account.</b></p>
+    <p>Dear valued customer, we detected suspicious access to your personal data. To protect your account,
+      please <b>verify your account within 24 hours</b> or it will be <b>temporarily suspended</b>.</p>
+    <div class="lure-actions">
+      <a class="btn btn-red" href="{{ url_for('store.phishing_notice') }}">Verify my account now</a>
+      <button class="btn btn-outline" type="button" id="lureClose">Ignore</button>
+    </div>
+    <p class="lure-tag">🎓 training simulation</p>
+  </div>
+</div>
+{% endif %}
+<div id="toasts" class="toasts" aria-live="polite"></div>
+<script src="{{ url_for('static', filename='js/shop.js') }}"></script>
+</body>
+</html>

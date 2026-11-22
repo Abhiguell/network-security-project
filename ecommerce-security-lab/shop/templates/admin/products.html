@@ -1,0 +1,26 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Products{% endblock %}
+{% block admin %}
+<div class="page-title"><div><h1>Products</h1><p>Edit price, stock and visibility.</p></div></div>
+<div class="card"><div class="table-wrap"><table>
+  <thead><tr><th>Product</th><th>Category</th><th>Price (Rp)</th><th>Stock</th><th>Visible</th><th></th></tr></thead>
+  <tbody>
+  {% for p in products %}
+    <tr>
+      <td>{{ p.emoji }} <b>{{ p.name }}</b><br><span class="small muted mono">{{ p.sku }}</span></td>
+      <td>{{ p.category }}</td>
+      <td><input form="pf{{ p.id }}" type="number" name="price" value="{{ p.price }}" min="1000" max="100000000" style="width:130px" aria-label="Price"></td>
+      <td><input form="pf{{ p.id }}" type="number" name="stock" value="{{ p.stock }}" min="0" max="100000" style="width:90px" aria-label="Stock"></td>
+      <td><input form="pf{{ p.id }}" type="checkbox" name="is_active" value="1" {{ 'checked' if p.is_active }} aria-label="Visible"></td>
+      <td>
+        <form method="post" id="pf{{ p.id }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="product_id" value="{{ p.id }}">
+          <button class="btn btn-sm" type="submit">Save</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table></div></div>
+{% endblock %}

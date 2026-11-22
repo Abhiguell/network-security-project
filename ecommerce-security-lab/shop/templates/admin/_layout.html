@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% set ep = request.endpoint %}
+{% block content %}
+<div class="admin-wrap" id="adminApp" data-alerts="{{ url_for('admin.api_alerts') }}" data-last-id="{{ last_event_id }}">
+  <aside class="admin-nav">
+    <div class="label">Store</div>
+    <a href="{{ url_for('admin.dashboard') }}" class="{{ 'active' if ep == 'admin.dashboard' }}">📊 Dashboard</a>
+    <a href="{{ url_for('admin.orders') }}" class="{{ 'active' if ep == 'admin.orders' }}">📦 Orders</a>
+    <a href="{{ url_for('admin.products') }}" class="{{ 'active' if ep == 'admin.products' }}">🏷 Products</a>
+    <a href="{{ url_for('admin.customers') }}" class="{{ 'active' if ep == 'admin.customers' }}">👥 Customers</a>
+    <div class="label">Security</div>
+    <a href="{{ url_for('admin.security') }}" class="{{ 'active' if ep == 'admin.security' }}">🛡 Security events <span class="count" id="navAlerts">{{ open_alerts or '' }}</span></a>
+    <a href="{{ url_for('admin.incidents') }}" class="{{ 'active' if ep == 'admin.incidents' }}">🚨 Incidents <span class="count" id="navIncidents">{{ open_incidents|length or '' }}</span></a>
+    <a href="{{ url_for('admin.simulation') }}" class="{{ 'active' if ep == 'admin.simulation' }}">🧪 Simulation API</a>
+    <div class="label">Threat level</div>
+    <div style="padding:4px 8px"><span class="status-pill status-{{ sec_status.level }}" id="statusPill">{{ sec_status.label }}</span></div>
+  </aside>
+  <section>
+    <div id="incidentBanner" class="incident-banner {{ 'hidden' if not open_incidents }}">
+      <h3>🚨 ACTIVE SECURITY INCIDENT{{ 'S' if open_incidents|length > 1 }} (SIMULATED)</h3>
+      <ul id="incidentList">{% for i in open_incidents %}<li><b>{{ i.kind|upper }}</b>: {{ i.title }} <span style="opacity:.75">({{ i.ts[11:] }})</span></li>{% endfor %}</ul>
+      <div class="small mt"><a href="{{ url_for('admin.incidents') }}">Open incident response →</a></div>
+    </div>
+    {% block admin %}{% endblock %}
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Incidents{% endblock %}
+{% block admin %}
+<div class="page-title"><div><h1>🚨 Incident response</h1><p>Incidents raised by detections. Resolve them after containment, or reset everything from the Cyber Lab.</p></div></div>
+<div class="card"><div class="table-wrap"><table>
+  <thead><tr><th>#</th><th>Opened</th><th>Type</th><th>Severity</th><th>Incident</th><th>Triggered by</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+  {% for i in incidents %}
+    <tr>
+      <td>{{ i.id }}</td><td class="small">{{ i.ts }}</td><td><b>{{ i.kind|upper }}</b></td>
+      <td><span class="badge b-{{ i.severity }}">{{ i.severity }}</span></td>
+      <td>{{ i.title }}<br><span class="small muted">{{ i.details }}</span></td>
+      <td class="mono small">{{ i.operator }}</td>
+      <td><span class="badge b-{{ i.status }}">{{ i.status }}</span>{% if i.resolved_at %}<br><span class="small muted">{{ i.resolved_at }}</span>{% endif %}</td>
+      <td>{% if i.status == 'open' %}<form method="post" action="{{ url_for('admin.resolve_incident', iid=i.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-teal btn-sm">Resolve</button></form>{% endif %}</td>
+    </tr>
+  {% else %}<tr><td colspan="8" class="empty">No incidents. ✅</td></tr>{% endfor %}
+  </tbody>
+</table></div></div>
+<div class="card mt">
+  <h2>Response playbook</h2>
+  <div class="grid g3 small">
+    <div><b>Spyware / data exposure</b><ul><li>Revoke the exposed API key</li><li>Notify affected customers (UU PDP)</li><li>Force password resets + enable MFA</li></ul></div>
+    <div><b>Ransomware</b><ul><li>Isolate the server from the network</li><li>Do not pay; identify the strain</li><li>Restore from offline backups, then patch</li></ul></div>
+    <div><b>Trojan / C2</b><ul><li>Block the C2 domain/IP at the firewall</li><li>Kill the process, remove the app</li><li>Re-image the device, rotate credentials</li></ul></div>
+  </div>
+</div>
+{% endblock %}

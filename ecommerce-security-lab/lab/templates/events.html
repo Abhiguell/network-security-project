@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Event log{% endblock %}
+{% block page_title %}Lab Event Log{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Lab event log</h1><p>Every simulation, sign-in and authorisation decision in the lab.</p></div></div>
+<div class="grid grid-2">
+  <div class="card"><div class="card-head"><h2>Events</h2></div><div class="table-wrap"><table>
+    <thead><tr><th>Time</th><th>Severity</th><th>Module</th><th>Message</th><th>Operator</th></tr></thead>
+    <tbody>{% for e in events %}<tr><td class="ts">{{ e.ts }}</td><td><span class="badge-s sev-{{ e.severity }}">{{ e.severity }}</span></td>
+      <td class="mono">{{ e.module }}</td><td>{{ e.message }}</td><td class="mono">{{ e.operator or '-' }}</td></tr>
+    {% else %}<tr><td colspan="5" class="empty">No events.</td></tr>{% endfor %}</tbody>
+  </table></div></div>
+  <div class="card"><div class="card-head"><h2>Simulation runs</h2></div><div class="table-wrap"><table>
+    <thead><tr><th>#</th><th>Module</th><th>Started</th><th>Operator</th><th>Status</th><th>Records</th></tr></thead>
+    <tbody>{% for r in runs %}<tr><td class="mono">{{ r.id }}</td><td><b>{{ r.module }}</b></td><td class="ts">{{ r.started_at }}</td>
+      <td class="mono">{{ r.operator }}</td><td>{{ r.status }}</td><td class="mono">{{ r.records }}</td></tr>
+    {% else %}<tr><td colspan="6" class="empty">No runs.</td></tr>{% endfor %}</tbody>
+  </table></div></div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}My profile{% endblock %}
+{% block content %}
+<div class="page-title"><div><h1>👤 My profile</h1><p>Member since {{ g.user.created_at[:10] }}</p></div>
+  <a class="btn btn-outline" href="{{ url_for('account.orders') }}">My orders ({{ stats.orders }})</a></div>
+<div class="grid g3 mb">
+  <div class="card stat"><div class="label">Orders</div><div class="value">{{ stats.orders }}</div></div>
+  <div class="card stat"><div class="label">Total spent</div><div class="value">{{ stats.spent|rupiah }}</div></div>
+  <div class="card stat"><div class="label">Last login</div><div class="value" style="font-size:1rem">{{ g.user.last_login or '-' }}</div></div>
+</div>
+<div class="grid g2">
+  <div class="card">
+    <h2>Personal details &amp; address</h2>
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="details">
+      <label for="full_name">Full name</label><input type="text" id="full_name" name="full_name" value="{{ g.user.full_name }}" maxlength="60" required>
+      <div class="row">
+        <div><label for="email">Email</label><input type="email" id="email" name="email" value="{{ g.user.email }}" maxlength="100" required></div>
+        <div><label for="phone">Phone</label><input type="text" id="phone" name="phone" value="{{ g.user.phone }}" maxlength="20" required></div>
+      </div>
+      <label for="address">Shipping address</label><input type="text" id="address" name="address" value="{{ g.user.address }}" maxlength="150">
+      <label for="city">City</label><input type="text" id="city" name="city" value="{{ g.user.city }}" maxlength="40">
+      <button class="btn mt" type="submit">Save profile</button>
+    </form>
+  </div>
+  <div class="card">
+    <h2>Change password</h2>
+    <form method="post" autocomplete="off">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="password">
+      <label for="current_password">Current password</label><input type="password" id="current_password" name="current_password" required>
+      <label for="new_password">New password</label><input type="password" id="new_password" name="new_password" required>
+      <label for="confirm_password">Confirm new password</label><input type="password" id="confirm_password" name="confirm_password" required>
+      <button class="btn btn-dark mt" type="submit">Update password</button>
+    </form>
+    <p class="hint mt">Passwords are stored as salted hashes, so not even the store admin can read them.</p>
+  </div>
+</div>
+{% endblock %}

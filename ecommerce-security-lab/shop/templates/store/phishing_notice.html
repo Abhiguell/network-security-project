@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Security awareness{% endblock %}
+{% block content %}
+<div class="card awareness">
+  <p class="badge b-sim">Phishing simulation · security awareness training</p>
+  <h1>🎣 Gotcha! That was a (simulated) phishing message</h1>
+  <p class="lead">Don't worry: <b>nothing was collected</b>. This page has no form and asks for nothing.
+    But in a real attack, the next page would have looked exactly like our sign-in page and stolen your password.</p>
+
+  <div class="grid g2 mt">
+    <div>
+      <h2>Why you received it</h2>
+      <p>The CyberSim Lab just ran a <b>spyware simulation</b> that exposed (synthetic) customer names, emails and phone numbers.
+        Criminals who steal this kind of data immediately send convincing <b>"verify your account"</b> messages to the victims,
+        because they already know your name and that you shop here.</p>
+      <h2>Red flags in the message</h2>
+      <ul>
+        <li><b>Urgency and threats</b>: "within 24 hours", "or your account will be suspended".</li>
+        <li><b>Unexpected request</b>: you didn't ask to verify anything.</li>
+        <li><b>A link instead of a normal sign-in</b>: real stores ask you to log in the usual way.</li>
+        <li><b>Asks for secrets</b>: passwords, OTP codes or card numbers. LabMart (and any real shop) never asks for these.</li>
+        <li><b>Timing</b>: it arrives right after news of a data leak.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>What to do instead</h2>
+      <ul>
+        <li>Don't click. Open the shop yourself by typing its address, or use the official app.</li>
+        <li>Check the real address bar: look-alike domains (<span class="mono">labmart-verify.co</span>) are a giveaway.</li>
+        <li>Never share an OTP code with anyone, not even "customer service".</li>
+        <li>Turn on two-factor authentication and use a unique password per site.</li>
+        <li>Report suspicious messages to the store.</li>
+      </ul>
+      <h2>What the store should do</h2>
+      <ul>
+        <li>Notify affected customers quickly and honestly (required by UU PDP).</li>
+        <li>Warn customers that it will <b>never</b> ask for passwords or OTPs by message.</li>
+        <li>Force password resets and offer MFA.</li>
+      </ul>
+    </div>
+  </div>
+  <p class="small muted mt">{% if active %}Your click was recorded in the store's security log (username only, nothing else) for the training statistics.{% else %}No phishing simulation is running right now.{% endif %}</p>
+  <a class="btn mt" href="{{ url_for('store.home') }}">Back to the store</a>
+</div>
+{% endblock %}

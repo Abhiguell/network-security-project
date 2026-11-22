@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{{ m.title }}{% endblock %}
+{% block page_title %}{{ m.title }}{% endblock %}
+{% block content %}
+<div id="moduleApp" data-module="{{ name }}" data-runs="{{ url_for('api.run', run_id=0)[:-1] }}"
+     {% block data_attrs %}{% endblock %}>
+<div class="page-head">
+  <div><h1>{{ m.icon }} {{ m.title }} <span class="sim-label">SIMULATED</span></h1><p>{{ m.summary }}</p></div>
+  <a class="btn btn-ghost open-shop" href="{{ shop_url }}/admin/" target="_blank" rel="noopener">Watch the effect in LabMart admin ↗</a>
+</div>
+
+<div class="grid grid-2 mb">
+  <div class="card control">
+    <div class="card-head"><h2>Control</h2>
+      <div class="run-status">Status: <span class="badge-s sev-info" id="runStatus">idle</span></div></div>
+    {% block controls_extra %}{% endblock %}
+    <div class="btn-row">
+      <button class="btn {% block start_class %}{% endblock %}" id="startBtn" type="button" {{ 'disabled' if not can_run }}>▶ {{ m.button }}</button>
+      {% block secondary_buttons %}{% endblock %}
+    </div>
+    {% if not can_run %}<p class="flash flash-warning small">Your role (<b>{{ g.user.role }}</b>) is read-only. Ask an admin or analyst to run simulations.</p>{% endif %}
+    <div><div class="small muted mb">Execution log</div>
+      <div class="terminal" id="term"><div class="line dim">Ready. Press start to run the simulation.</div></div></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h2>Results</h2><span class="sim-label">SIMULATED DATA</span></div>
+    <div id="results">{% block results_empty %}<div class="results-empty">No results yet.</div>{% endblock %}</div>
+  </div>
+</div>
+
+<div class="card impact mb">
+  <h2>Security impact</h2>
+  {% block impact %}{% endblock %}
+</div>
+
+<div class="card">
+  <div class="card-head"><h2>Run history</h2></div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>#</th><th>Started</th><th>Operator</th><th>Status</th><th>Records / events</th></tr></thead>
+    <tbody>
+    {% for r in history %}<tr><td class="mono">{{ r.id }}</td><td class="ts">{{ r.started_at }}</td><td class="mono">{{ r.operator }}</td>
+      <td><span class="badge-s {{ 'tag-ok' if r.status == 'completed' else ('sev-critical' if r.status == 'running' else 'sev-medium') }}">{{ r.status }}</span></td><td class="mono">{{ r.records }}</td></tr>
+    {% else %}<tr><td colspan="5" class="empty">No runs yet.</td></tr>{% endfor %}
+    </tbody>
+  </table></div>
+</div>
+</div>
+{% endblock %}

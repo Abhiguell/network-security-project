@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Simulation Control Panel{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>◈ E-Commerce Security Testing &amp; Malware Simulation Lab</h1>
+    <p>Run controlled attacks against the LabMart test store and watch its defences react. <span class="sim-label">ALL ACTIVITY IS SIMULATED</span></p></div>
+  <div class="btn-row">
+    <a class="btn btn-ghost" href="{{ shop_url }}/admin/" target="_blank" rel="noopener">Open LabMart admin ↗</a>
+    {% if can_run %}<button class="btn btn-warning" id="resetAll" type="button" data-url="{{ url_for('api.reset') }}" data-runs="{{ url_for('api.run', run_id=0)[:-1] }}">↺ Reset environment</button>{% endif %}
+  </div>
+</div>
+
+<div class="card mb" id="connCard">
+  <div class="card-head"><h2>Target: LabMart e-commerce store</h2><span class="mono small muted">{{ shop_url }}</span></div>
+  <div class="grid grid-4">
+    <div><div class="label muted small">API connection</div><div class="conn"><span class="dot" id="cDot"></span><b id="cText">checking…</b></div></div>
+    <div><div class="label muted small">Synthetic records available</div><b class="mono" id="cRecords">-</b></div>
+    <div><div class="label muted small">Store threat level</div><span class="status-pill status-ok" id="cThreat">-</span></div>
+    <div><div class="label muted small">Open incidents on store</div><b class="mono" id="cIncidents">-</b></div>
+  </div>
+  <p class="small muted mt" id="cError"></p>
+</div>
+
+<div class="grid grid-3 mb">
+  {% for key, m in modules.items() %}
+  <div class="card module-card">
+    <div class="card-head"><span class="ico">{{ m.icon }}</span>
+      {% set r = last[key] %}
+      <span class="badge-s {{ 'sev-critical' if r and r.status == 'running' else ('tag-ok' if r and r.status == 'completed' else 'sev-info') }}">{{ r.status if r else 'never run' }}</span></div>
+    <h2>{{ m.title }}</h2>
+    <p class="muted small">{{ m.summary }}</p>
+    <div class="meta"><span>Runs: {{ counts[key] }}</span><span>Last: {{ r.started_at[11:] if r else '-' }}{% if r %} by {{ r.operator }}{% endif %}</span></div>
+    <a class="btn {{ 'btn-warning' if m.color == 'warning' else ('btn-danger' if m.color == 'danger' else 'btn-blue') }}" href="{{ url_for('pages.module', name=key) }}">Open module →</a>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="grid grid-2">
+  <div class="card">
+    <div class="card-head"><h2>Lab event log</h2><a class="small" href="{{ url_for('pages.events') }}">All →</a></div>
+    <div class="table-wrap"><table>
+      <tbody>
+      {% for e in events %}
+        <tr><td class="ts">{{ e.ts[11:] }}</td><td><span class="badge-s sev-{{ e.severity }}">{{ e.severity }}</span></td>
+          <td><b>{{ e.module }}</b> · <span class="muted">{{ e.message }}</span></td></tr>
+      {% else %}<tr><td class="empty">No events yet.</td></tr>{% endfor %}
+      </tbody>
+    </table></div>
+  </div>
+  <div class="card edu">
+    <h2>Presenter guide</h2>
+    <ol class="muted">
+      <li>Tab 1: LabMart admin (<code>{{ shop_url }}/admin/login</code>, <code>admin</code>).</li>
+      <li>Tab 2: this lab, signed in as <code>analyst</code> or <code>labadmin</code>.</li>
+      <li>Open a module and press its <b>Start</b> button.</li>
+      <li>Switch to Tab 1: a toast alert, a red incident banner and a new threat level appear within 3 seconds.</li>
+      <li>Finish with <b>Reset environment</b> to restore everything.</li>
+    </ol>
+    <div class="terminal hidden" id="resetLog" style="height:180px"></div>
+  </div>
+</div>
+{% endblock %}

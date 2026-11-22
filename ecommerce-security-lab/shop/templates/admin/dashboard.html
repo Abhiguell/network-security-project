@@ -1,0 +1,35 @@
+{% extends "admin/_layout.html" %}
+{% from "_macros.html" import status_badge %}
+{% block title %}Admin dashboard{% endblock %}
+{% block admin %}
+<div class="page-title"><div><h1>Store dashboard</h1><p>Sales, customers and security at a glance. Live alerts appear in the corner.</p></div></div>
+<div class="grid g4 mb">
+  <div class="card stat"><div class="label">Revenue (paid)</div><div class="value">{{ s.revenue|rupiah }}</div><div class="sub">incl. synthetic history</div></div>
+  <div class="card stat"><div class="label">Orders</div><div class="value">{{ s.orders }}</div><div class="sub">{{ s.pending }} pending</div></div>
+  <div class="card stat"><div class="label">Customers</div><div class="value">{{ s.customers }}</div><div class="sub">+ {{ s.synthetic }} synthetic test records</div></div>
+  <div class="card stat"><div class="label">Security events (24h)</div><div class="value">{{ s.events_24h }}</div><div class="sub">{{ s.failed_24h }} failed logins</div></div>
+</div>
+<div class="grid g2 mb" id="charts" data-api="{{ url_for('admin.api_stats') }}">
+  <div class="card"><h2>Sales, last 7 days</h2><div class="chart-box"><canvas id="chartSales"></canvas></div></div>
+  <div class="card"><h2>Security events by severity</h2><div class="chart-box"><canvas id="chartSev"></canvas></div></div>
+</div>
+<div class="grid g2">
+  <div class="card">
+    <div class="page-title" style="margin-bottom:8px"><h2>Latest security alerts</h2><a href="{{ url_for('admin.security') }}">All →</a></div>
+    <table><tbody>
+    {% for e in alerts %}
+      <tr><td class="small muted">{{ e.ts[11:] }}</td><td><span class="badge b-{{ e.severity }}">{{ e.severity }}</span></td>
+        <td><b>{{ e.category }}</b> {% if e.source == 'simulation' %}<span class="badge b-sim">lab</span>{% endif %}<br><span class="small muted">{{ e.message }}</span></td></tr>
+    {% else %}<tr><td class="empty">No alerts. All quiet. ✅</td></tr>{% endfor %}
+    </tbody></table>
+  </div>
+  <div class="card">
+    <div class="page-title" style="margin-bottom:8px"><h2>Recent customer orders</h2><a href="{{ url_for('admin.orders') }}">All →</a></div>
+    <table><tbody>
+    {% for o in recent_orders %}
+      <tr><td class="mono small">{{ o.order_code }}</td><td>{{ o.username }}</td><td>{{ o.total|rupiah }}</td><td>{{ status_badge(o.status) }}</td></tr>
+    {% else %}<tr><td class="empty">No real customer orders yet.</td></tr>{% endfor %}
+    </tbody></table>
+  </div>
+</div>
+{% endblock %}

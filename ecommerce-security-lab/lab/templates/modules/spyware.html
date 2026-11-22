@@ -1,0 +1,27 @@
+{% extends "modules/_module.html" %}
+{% block data_attrs %}data-start="{{ url_for('api.spyware_start') }}"{% endblock %}
+{% block start_class %}btn-warning{% endblock %}
+{% block controls_extra %}
+<p class="small muted">Calls the store's authorised simulation API with an HMAC-signed request and retrieves <b>synthetic</b> customer
+  records only. Real accounts, password hashes and payment data are never returned.</p>
+{% endblock %}
+{% block secondary_buttons %}<button class="btn btn-ghost" id="clearBtn" type="button">Clear results</button>{% endblock %}
+{% block impact %}
+<div class="grid grid-3">
+  <div><h3>What happened</h3><ul>
+    <li>A hidden component read the customer database through a trusted channel.</li>
+    <li><b>Personal data</b> was exposed: names, emails, phones, addresses and purchase history.</li>
+    <li>The store flagged it as <b>Spyware Data Exposure</b> + <b>Mass Data Access</b> and opened an incident.</li>
+    <li><b>Follow-up phishing:</b> shoppers on LabMart now get a fake "verify your account" pop-up. Clicks are logged as
+      <b>Phishing Lure Clicked</b>. It disappears on reset.</li></ul></div>
+  <div><h3>Real-world consequences</h3><ul>
+    <li>Phishing and scam calls targeting customers ("your order has a problem…").</li>
+    <li>Legal duty to notify under Indonesia's <b>UU PDP (Law 27/2022)</b>; possible fines.</li>
+    <li>Loss of customer trust and reputation.</li></ul></div>
+  <div><h3>Defences shown / recommended</h3><ul>
+    <li><b>Least privilege</b>: the API can only see synthetic rows.</li>
+    <li>Passwords stored as <b>salted hashes</b>; cards handled by Midtrans (never stored).</li>
+    <li>Alert on bulk PII reads (DLP), signed API calls, audit trail of the operator.</li>
+    <li>Encrypt sensitive columns; MFA for admin accounts.</li></ul></div>
+</div>
+{% endblock %}

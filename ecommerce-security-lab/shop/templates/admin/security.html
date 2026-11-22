@@ -1,0 +1,31 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Security events{% endblock %}
+{% block admin %}
+<div class="page-title"><div><h1>Security event log</h1><p>Detections from the store and from Cyber Lab simulations (<span class="badge b-sim">lab</span>). Also written to <span class="mono">shop/logs/security.log</span>.</p></div>
+  <form method="post" action="{{ url_for('admin.ack_all') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-dark">✓ Acknowledge all</button></form></div>
+<form method="get" class="card mb row" style="align-items:flex-end">
+  <div><label for="severity">Severity</label><select id="severity" name="severity"><option value="">All</option>{% for s in severities %}<option {{ 'selected' if f.get('severity') == s }}>{{ s }}</option>{% endfor %}</select></div>
+  <div><label for="source">Source</label><select id="source" name="source"><option value="">All</option><option value="web" {{ 'selected' if f.get('source') == 'web' }}>Website</option><option value="simulation" {{ 'selected' if f.get('source') == 'simulation' }}>Cyber Lab simulation</option></select></div>
+  <div><label for="status">Status</label><select id="status" name="status"><option value="">All</option><option value="open" {{ 'selected' if f.get('status') == 'open' }}>Open only</option></select></div>
+  <div style="flex:0"><button class="btn btn-outline" type="submit">Filter</button></div>
+</form>
+<div class="card mb"><div class="table-wrap"><table>
+  <thead><tr><th>Time</th><th>Severity</th><th>Event</th><th>Source</th><th></th></tr></thead>
+  <tbody>
+  {% for e in events %}
+    <tr style="{{ 'opacity:.5' if e.acknowledged }}">
+      <td class="small" style="white-space:nowrap">{{ e.ts }}</td>
+      <td><span class="badge b-{{ e.severity }}">{{ e.severity }}</span></td>
+      <td><b>{{ e.category }}</b> {% if e.source == 'simulation' %}<span class="badge b-sim">lab</span>{% endif %}<br>{{ e.message }}
+        {% if e.details %}<br><span class="small muted mono">{{ e.details }}</span>{% endif %}</td>
+      <td class="small mono">{{ e.ip }}<br>{{ e.username or '' }}</td>
+      <td>{% if not e.acknowledged %}<form method="post" action="{{ url_for('admin.ack', eid=e.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-outline btn-sm">Ack</button></form>{% else %}✓{% endif %}</td>
+    </tr>
+  {% else %}<tr><td colspan="5" class="empty">No events.</td></tr>{% endfor %}
+  </tbody>
+</table></div></div>
+<div class="card"><h2>Recent login attempts</h2><table><tbody>
+  {% for l in logins %}<tr><td class="small">{{ l.ts }}</td><td class="mono">{{ l.username }}</td><td class="mono small">{{ l.ip }}</td><td>{% if l.success %}<span class="badge b-ok">success</span>{% else %}<span class="badge b-bad">failed</span>{% endif %}</td></tr>
+  {% else %}<tr><td class="empty">None yet.</td></tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}

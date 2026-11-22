@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Demo payment{% endblock %}
+{% block content %}
+<div class="card paybox">
+  <div class="gateway-head"><h2 style="margin:0">🧪 Demo Payment Gateway</h2><span class="badge b-sim">simulated</span></div>
+  <p class="sim-note">This page stands in for Midtrans when no sandbox keys are configured. <b>No card details are requested and no money moves.</b></p>
+  <div class="summary-row"><span>Merchant</span><b>LabMart</b></div>
+  <div class="summary-row"><span>Order</span><span class="mono">{{ order.order_code }}</span></div>
+  {% for i in items %}<div class="summary-row small muted"><span>{{ i.name }} × {{ i.qty }}</span><span>{{ (i.price * i.qty)|rupiah }}</span></div>{% endfor %}
+  <div class="summary-row total"><span>Amount</span><span>{{ order.total|rupiah }}</span></div>
+  {% if order.status == 'pending' %}
+  <form method="post" class="row mt">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn btn-outline" name="action" value="cancel" type="submit">Cancel</button>
+    <button class="btn btn-teal btn-lg" name="action" value="pay" type="submit">✓ Simulate successful payment</button>
+  </form>
+  {% else %}<p class="mt">This order is already <b>{{ order.status }}</b>. <a href="{{ url_for('account.order_detail', code=order.order_code) }}">View order</a></p>{% endif %}
+</div>
+{% endblock %}

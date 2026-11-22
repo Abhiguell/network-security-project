@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{% block title %}Lab{% endblock %} · CyberSim Lab</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/lab.css') }}">
+</head>
+<body>
+{% set ep = request.endpoint or '' %}
+{% if g.user %}
+<aside class="sidebar" id="sidebar">
+  <div class="brand"><span class="logo">◈</span> CyberSim<span class="accent">Lab</span></div>
+  <nav>
+    <div class="nav-label">Control panel</div>
+    <a href="{{ url_for('pages.dashboard') }}" class="{{ 'active' if ep == 'pages.dashboard' }}"><span class="nav-ico">▣</span>Dashboard</a>
+    <div class="nav-label">Simulation modules</div>
+    <a href="{{ url_for('pages.module', name='spyware') }}" class="{{ 'active' if request.view_args and request.view_args.get('name') == 'spyware' }}"><span class="nav-ico">👁</span>Spyware</a>
+    <a href="{{ url_for('pages.module', name='ransomware') }}" class="{{ 'active' if request.view_args and request.view_args.get('name') == 'ransomware' }}"><span class="nav-ico">🔒</span>Ransomware</a>
+    <a href="{{ url_for('pages.module', name='trojan') }}" class="{{ 'active' if request.view_args and request.view_args.get('name') == 'trojan' }}"><span class="nav-ico">🐴</span>Trojan</a>
+    <div class="nav-label">Records</div>
+    <a href="{{ url_for('pages.events') }}" class="{{ 'active' if ep == 'pages.events' }}"><span class="nav-ico">≋</span>Lab event log</a>
+    <a href="{{ shop_url }}/admin/" target="_blank" rel="noopener"><span class="nav-ico">↗</span>Open LabMart admin</a>
+  </nav>
+  <form method="post" action="{{ url_for('auth.logout') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn btn-ghost w-100" type="submit">⏻ Sign out</button>
+  </form>
+</aside>
+<div class="main">
+  <header class="topbar">
+    <button class="icon-btn" id="sidebarToggle" type="button" aria-label="Menu">☰</button>
+    <div class="topbar-title">{% block page_title %}{% endblock %}</div>
+    <div class="topbar-right">
+      <span class="status-pill status-warning" id="connPill" title="Connection to the LabMart simulation API">CONNECTING…</span>
+      <span class="user-chip">{{ g.user.username }} · {{ g.user.role }}</span>
+    </div>
+  </header>
+{% endif %}
+  <main class="{{ 'content' if g.user else 'content-public' }}" id="labRoot" data-status="{{ url_for('api.status') if g.user else '' }}">
+    {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}
+      <div class="flashes">{% for c, m in messages %}<div class="flash flash-{{ c }}">{{ m }}</div>{% endfor %}</div>
+    {% endif %}{% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+{% if g.user %}</div>{% endif %}
+<div id="toasts" class="toasts"></div>
+<script src="{{ url_for('static', filename='js/lab.js') }}"></script>
+</body>
+</html>
